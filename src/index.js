@@ -1,17 +1,19 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Client } from 'pg';
-import * as schema from './schema';
+const express = require('express');
+const productRoutes = require('./product.routes');
+const userRouter = require('./user/user.router');
+const { logRequest } = require('./middleware');
+const bodyParser = require('body-parser');
+const { errorResponder } = require('./error.middleware');
 
+const app = express();
+const PORT = 3000;
 
-const client = new Client({
-   host: '127.0.0.1',
-   port: 5432,
-   user: 'nodejs_course_admin',
-   password: 'my_password',
-   database: 'nodejs_course_database',
+app.use(bodyParser.json());
+app.use(logRequest);
+app.use(productRoutes);
+app.use(userRouter);
+app.use(errorResponder);
 
+app.listen(PORT, () => {
+   console.log(`Server listening at http://localhost:${PORT}`);
 });
-
-await client.connect();
-
-export const db = drizzle(client, { schema });
